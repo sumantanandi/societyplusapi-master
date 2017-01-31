@@ -13,7 +13,7 @@ var EventEmitter = require('events').EventEmitter;
 //var applicationStore = require('./libs/salesforceConnect');
 
 var applicationStore = require('./CreateCustomerLP');
-//var salesforceConnection = require('./SalesforceConnect');
+var salesforceConnection = require('./SalesforceConnect');
 
 
 var fetchBasicAuthFromDatabase = {};
@@ -28,7 +28,8 @@ var submitApplicationProcess = new EventEmitter();
  */
 submitApplicationProcess.on('submit-application', function (application) {
   //console.log(" submit submitApplicationProcess ", application)
-  applicationStore.sendMessage(application); //A131909 A130016
+  //applicationStore.sendMessage(application); //A131909 A130016
+  salesforceConnection.saveApplication(application);
 });
 
 var app = express();
