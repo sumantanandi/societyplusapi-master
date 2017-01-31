@@ -7,7 +7,7 @@ exports.sendMessage = (message) => {
         console.log(" Message to create customer in LaunchPad", message);
         var bodyObj = {
             "countryId": 15,
-            "email": "launchpad12.testemail@test.com",
+            "email": "launchpad13.testemail@test.com",
             "merchantCampaignManager": "testmanager",
             "merchantCampaignManagerContact": "0470898787",
             "merchantCategory": "string",
