@@ -1,0 +1,24 @@
+{
+  "name": "MEAN",
+  "version": "1.0.0",
+  "description": "A MEAN app that allows users to manage contact lists",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "client-oauth2": "^2.2.0",
+    "events": "^1.1.1",
+    "express": "^4.14.1",
+    "fs": "0.0.1-security",
+    "mongodb": "^2.1.6",
+    "nforce": "^1.7.0",
+    "node-salesforce": "^0.8.0",
+    "path": "^0.12.7",
+    "pg": "4.5.6",
+    "promise": "^7.1.1",
+    "simple-oauth2": "^0.7.0"
+  }
+}
