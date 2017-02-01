@@ -29,6 +29,7 @@ var submitApplicationProcess = new EventEmitter();
 submitApplicationProcess.on('submit-application', function (application) {
   //console.log(" submit submitApplicationProcess ", application)
   //applicationStore.sendMessage(application); //A131909 A130016
+  //var application = req.body.id;
   salesforceConnection.saveApplication(application);
 });
 

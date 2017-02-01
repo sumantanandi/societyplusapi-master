@@ -7,6 +7,7 @@ var environment = process.env.NODE_ENV || 'local';
 var org = "";
 var oauth;
 var caseNumber = '';
+var createCustomer  = require('./CreateCustomerLP');
 
 createCase = (caseDetails) => {
     console.log(' Inside Case Object  :');
@@ -29,10 +30,12 @@ exports.saveApplication = (application) => {
     var sfdcEnvironment = configuration[environment].salesforce.environment;
     var username = configuration[environment].salesforce.username; //'gewsprod@ge.com.orig.orignzqa' //@lfs.com.orignzqa';
     var password = configuration[environment].salesforce.password; //
+    var token = configuration[environment].salesforce.securityToken;; //securityToken
 
     console.log(" clientId : ", clientId);
     console.log(" clientSecret ", clientSecret);
     console.log(" sfdcEnvironment ", sfdcEnvironment);
+    console.log(" token ", token);
 
     org = nforce.createConnection({
         loginUrl: loginUrl,
@@ -44,25 +47,41 @@ exports.saveApplication = (application) => {
         mode: 'multi' // optional, 'single' or 'multi' user mode, multi default 
     });
 
-    org.authenticate({ username: username, password: password }, function (err, resp) {
+    org.authenticate({ username: username, password: password, securityToken: token }, function (err, resp) {
         if (!err) oauth = resp;
         console.log('OAuth ', oauth);
         console.log('Access Token :: ' + oauth.access_token);
         console.log("User ID :: " + oauth.id);
         console.log('Instance URL ::', oauth.instance_url);
-        //' and firstName LIKE \''+String.escapeSingleQuotes(name)+'%\'';
-        caseNumber = "03055059";
-        var caseQuery = 'SELECT Service__r.Id, Service__r.Main_Contact_Email_Address__c,Service__r.Main_Contact_Full_Name__c,Service__r.New_Website__c,	ContactPhone, Service__r.csordmedia__Product_Bundle__c FROM Case WHERE CaseNumber = \'' + caseNumber + '\'';
+        caseNumber = '03055059';
+        var caseQuery = 'SELECT Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
         org.query({ query: caseQuery, oauth: oauth }, function (err, resp) {
             if (!err && resp.records) {
                 var accoutName = resp.records[0];
-                var fields = accoutName._fields;
-                console.log(" Accout Name  ::", fields.account.name);
-                var contactEmail = accoutName.contact.Email;
-                var mobilePhone = resp.records[0].mobilePhone;
+                //var fields = accoutName._fields;
+                console.log(" Accout Name  ::", accoutName);
+                var emailAddress = resp.records[0]._fields.service__r.Main_Contact_Email_Address__c;
+                var contactMobile = resp.records[0]._fields.service__r.MainContact__r.Phone;
+                var contactFullName = resp.records[0]._fields.service__r.Main_Contact_Full_Name__c;
+                var websiteDomain = resp.records[0]._fields.service__r.New_Website__c;
+                var productServiceType = resp.records[0]._fields.service__r.Service_Type__c;
+                var totalrecurringCharges = resp.records[0]._fields.service__r.Total_Recurring_Charges__c;
+                var salesforceID = resp.records[0]._fields.service__r.Id;
+                var productServiceID = "";
+                if (productServiceType == 'Sensis Website'){
+                    productServiceID = '21';
+                }
+                console.log(" contactFullName  ::", contactFullName);
+                console.log(" emailAddress  ::", emailAddress);
+                console.log(" contactMobile  ::", contactMobile);
+                console.log(" websiteDomain  ::", websiteDomain);
+                console.log(" productServiceType  ::", productServiceType);
+                console.log(" productServiceID  ::", productServiceID);
+                console.log(" totalrecurringCharges  ::", totalrecurringCharges);
+                console.log(" salesforceID  ::", salesforceID);
+                console.log(" emailAddress  ::", emailAddress);
 
-                console.log(" Contact  Email  ::", contactEmail);
-                console.log(" Mobile Phone  ::", mobilePhone);
+                createCustomer.sendMessage(caseNumber,contactFullName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
             }
             if (err) {
                 console.log('ERROR MESSAGE :Salesforce Object Query ', err);
