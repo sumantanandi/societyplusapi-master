@@ -14,7 +14,7 @@ var access_token = "3BbszTGeIRQWlhPg9izUyooHB59zoYd7nA2bth1p/SKRQEQB8cj2Y1c+/pPA
 var environment = process.env.NODE_ENV || 'local';
 
 
-function updateChatter(caseNumber, customerID) {
+function updateChatter( salesforceCaseID ,caseNumber, customerID) {
 
     console.log(" Calling Salesforce Chatter Update Service ");
     var configuration = JSON.parse(
@@ -49,10 +49,10 @@ function updateChatter(caseNumber, customerID) {
 
     org.authenticate({ username: username, password: password, securityToken: token }, function (err, resp) {
         if (!err) oauth = resp;
-        console.log("Salesforce ID ",resp.id);
+        console.log("Salesforce ID ",salesforceCaseID);
         //org.chatter.postFeedItem({id: '500p0000003Ip70AAC', text: 'My Awesome Post!!'}, function(err, resp) {
         var chatterText = "Case ID : " + caseNumber + "  has been closed and LaunchPad Customer ID : " + customerID + " has been updated ";
-        org.chatter.postFeedItem({ id: '500p0000003Ip70AAC', text: chatterText, oauth: oauth }, function (err, resp) {
+        org.chatter.postFeedItem({ id: salesforceCaseID, text: chatterText, oauth: oauth }, function (err, resp) {
             console.log(" --- update salesforce chatter --- ");
             if (!err) console.log(resp);
             if (err) console.log(err);
@@ -184,7 +184,7 @@ function populateStatus(caseID, customerID) {
                 caseHistory.set('CaseNumber', caseID);
                 caseHistory.set('Status', 'Closed');
                 caseHistory.set('Case_Comments__c', customerID);
-
+                updateChatter( salesforceCaseID, caseID, customerID);
                 //caseHistory.setExternalId('Id', caseNumber);
                 //caseHistory.setExternalId('Legacy_Advertiser_ID__c', caseNumber);
                 //caseHistory.setExternalId('APF_Case_ID__c', caseNumber);
@@ -296,7 +296,7 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
             setTimeout(function (counter) {
                 console.log('Chaneg Status of Case ID Salesforce Application ');
                 populateStatus(caseNumber, customerId);
-                updateChatter(caseNumber, customerId);
+                //updateChatter(caseNumber, customerId);
             }, 5000);//interval * counter, counter
             // }, 5000);
 
