@@ -17,6 +17,7 @@
     "fs": "0.0.1-security",
     "mongodb": "^2.1.6",
     "nforce": "^1.7.0",
+    "nforce-chatter": "0.0.1",
     "node-salesforce": "^0.8.0",
     "path": "^0.12.7",
     "pg": "4.5.6",

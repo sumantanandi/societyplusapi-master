@@ -1,6 +1,7 @@
 'use strict';
 var request = require("request");
 var nforce = require('nforce');
+var chatter = require('nforce-chatter')(nforce);
 var randomstring = require("randomstring");
 //var truncate = require('truncate');
 //var dateFormat = require('dateformat');
@@ -11,6 +12,54 @@ var oauth;
 var counter = 0;
 var access_token = "3BbszTGeIRQWlhPg9izUyooHB59zoYd7nA2bth1p/SKRQEQB8cj2Y1c+/pPAZdkm";
 var environment = process.env.NODE_ENV || 'local';
+
+
+function updateChatter(caseNumber, customerID) {
+
+    console.log(" Calling Salesforce Chatter Update Service ");
+    var configuration = JSON.parse(
+        fs.readFileSync(path.join(__dirname, './config/configs.js'))
+    );
+    console.log(" NODE ENV IN EXPORT APPS", environment);
+    var loginUrl = configuration[environment].salesforce.username;
+    var clientId = configuration[environment].salesforce.clientId;
+    var clientSecret = configuration[environment].salesforce.clientSecret;
+    var redirectUri = configuration[environment].salesforce.redirectUri;
+    var apiVersion = configuration[environment].salesforce.apiVersion;
+    var sfdcEnvironment = configuration[environment].salesforce.environment;
+    var username = configuration[environment].salesforce.username; //'gewsprod@ge.com.orig.orignzqa' //@lfs.com.orignzqa';
+    var password = configuration[environment].salesforce.password; //
+    var token = configuration[environment].salesforce.securityToken;; //securityToken
+
+    console.log(" clientId : ", clientId);
+    console.log(" clientSecret ", clientSecret);
+    console.log(" sfdcEnvironment ", sfdcEnvironment);
+    console.log(" token ", token);
+
+    org = nforce.createConnection({
+        loginUrl: loginUrl,
+        clientId: clientId,
+        clientSecret: clientSecret,
+        redirectUri: redirectUri,
+        apiVersion: apiVersion,  // optional, defaults to current salesforce API version 
+        environment: sfdcEnvironment,  // optional, salesforce 'sandbox' or 'production', production default 
+        mode: 'multi',
+        plugins: ['chatter'] // optional, 'single' or 'multi' user mode, multi default postFeedItem
+    });
+
+    org.authenticate({ username: username, password: password, securityToken: token }, function (err, resp) {
+        if (!err) oauth = resp;
+        console.log("Salesforce ID ",resp.id);
+        //org.chatter.postFeedItem({id: '500p0000003Ip70AAC', text: 'My Awesome Post!!'}, function(err, resp) {
+        var chatterText = "Case ID : " + caseNumber + "  has been closed and LaunchPad Customer ID : " + customerID + " has been updated ";
+        org.chatter.postFeedItem({ id: '500p0000003Ip70AAC', text: chatterText, oauth: oauth }, function (err, resp) {
+            console.log(" --- update salesforce chatter --- ");
+            if (!err) console.log(resp);
+            if (err) console.log(err);
+        });
+    });
+}
+
 
 
 function updateLaunchPadDetails(customerID) {
@@ -71,7 +120,7 @@ function updateLaunchPadDetails(customerID) {
                         console.log('ERROR MESSAGE :UPDATE ', err);
                     }
                 });
-               // }, 7000);
+                // }, 7000);
 
             }
         });
@@ -171,7 +220,7 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
         console.log(" productServiceID  ::", productServiceID);
         console.log("productServiceType ", productServiceType);
         console.log(" totalrecurringCharges  ::", totalrecurringCharges);
-        if(websiteDomain == null){
+        if (websiteDomain == null) {
             websiteDomain = "www.sensis.com";
         }
         var emailField = randomstring.generate(7) + "launchpad63.testemail@test.com";
@@ -242,13 +291,14 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
             console.log("CUSTOMER ID CREATED IN LAUNCH PAD ::::::::::: ", customerId);
             counter = counter + 1;
             //setTimeout(function () {
-                console.log('Update Customer ID in  Case :: Salesforce Application ');
-                //updateLaunchPadDetails(customerId)
-                setTimeout(function (counter) {
-                    console.log('Chaneg Status of Case ID Salesforce Application ');
-                    populateStatus(caseNumber, customerId);
-                }, 5000);//interval * counter, counter
-           // }, 5000);
+            console.log('Update Customer ID in  Case :: Salesforce Application ');
+            //updateLaunchPadDetails(customerId)
+            setTimeout(function (counter) {
+                console.log('Chaneg Status of Case ID Salesforce Application ');
+                populateStatus(caseNumber, customerId);
+                updateChatter(caseNumber, customerId);
+            }, 5000);//interval * counter, counter
+            // }, 5000);
 
 
             if (error) {
