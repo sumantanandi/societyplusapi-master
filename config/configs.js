@@ -33,6 +33,7 @@
                 "environment":"sandbox",
                   "username":"sumanta.nandi@accenture.com.newco.sit",
                     "password":"S1%ummer",
+                    "securityToken":"b7xHKvh7nM2NcCyuN60LDZp3",
                       "mode":"multi",
                         "Branch__c":"a0A9000000NjWJk",
                           "Brand_Lookup__c":"a0f90000003ZwGj",
