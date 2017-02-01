@@ -166,7 +166,7 @@ exports.sendMessage = (caseNumber, contactFullName, emailAddress, contactMobile,
 
         var bodyObj = {
             "countryId": 15,
-            "email": "launchpad57.testemail@test.com",
+            "email": "launchpad58.testemail@test.com",
             "merchantCampaignManager": "null",
             "merchantCampaignManagerContact": "null",
             "merchantCategory": "null",
