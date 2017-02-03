@@ -14,7 +14,7 @@ var access_token = "3BbszTGeIRQWlhPg9izUyooHB59zoYd7nA2bth1p/SKRQEQB8cj2Y1c+/pPA
 var environment = process.env.NODE_ENV || 'local';
 
 
-function updateChatter( salesforceCaseID ,caseNumber, customerID) {
+function updateChatter(salesforceCaseID, caseNumber, customerID) {
 
     console.log(" Calling Salesforce Chatter Update Service ");
     var configuration = JSON.parse(
@@ -49,12 +49,12 @@ function updateChatter( salesforceCaseID ,caseNumber, customerID) {
 
     org.authenticate({ username: username, password: password, securityToken: token }, function (err, resp) {
         if (!err) oauth = resp;
-        console.log("Salesforce ID ",salesforceCaseID);
+        console.log("Salesforce ID ", salesforceCaseID);
         //org.chatter.postFeedItem({id: '500p0000003Ip70AAC', text: 'My Awesome Post!!'}, function(err, resp) {
         var chatterText = "Case ID : " + caseNumber + "  has been closed and LaunchPad Customer ID : " + customerID + " has been updated ";
         org.chatter.postFeedItem({ id: salesforceCaseID, text: chatterText, oauth: oauth }, function (err, resp) {
             console.log(" --- update salesforce chatter --- ");
-            if (!err) console.log(resp);
+            if (!err) console.log("resp");
             if (err) console.log(err);
         });
     });
@@ -184,7 +184,7 @@ function populateStatus(caseID, customerID) {
                 caseHistory.set('CaseNumber', caseID);
                 caseHistory.set('Status', 'Closed');
                 caseHistory.set('Case_Comments__c', customerID);
-                updateChatter( salesforceCaseID, caseID, customerID);
+                updateChatter(salesforceCaseID, caseID, customerID);
                 //caseHistory.setExternalId('Id', caseNumber);
                 //caseHistory.setExternalId('Legacy_Advertiser_ID__c', caseNumber);
                 //caseHistory.setExternalId('APF_Case_ID__c', caseNumber);
@@ -207,11 +207,13 @@ function populateStatus(caseID, customerID) {
 }
 
 
-exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
+exports.sendMessage = (accountID, accountName, caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
     return new Promise(function (resolve, reject) {
         console.log(" Message to create customer in LaunchPad");
         console.log(" caseNumber  ::", caseNumber);
         console.log(" contactFullName  ::", contactFullName);
+        console.log(" accountID  ::", accountID);
+        console.log(" accountName  ::", accountName);
         console.log(" contactFirstName  ::", contactFirstName);
         console.log(" contactLastName  ::", contactLastName);
         console.log(" emailAddress  ::", emailAddress);
@@ -223,7 +225,7 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
         if (websiteDomain == null) {
             websiteDomain = "www.sensis.com";
         }
-        var emailField = randomstring.generate(7) + "launchpad63.testemail@test.com";
+        var emailField = randomstring.generate(7) + emailAddress;// "launchpad63.testemail@test.com";
         var bodyObj = {
             "countryId": 15,
             "email": emailField,//emailAddress,//"launchpad63.testemail@test.com",
@@ -235,7 +237,7 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
             "merchantConsultantContact": "null",
             "merchantContractEndDate": "null",
             "merchantCustomerValue": "null",
-            "merchantId": "null",
+            "merchantId": "001p000000HzOHzAAN",//accountID,
             "merchantItemId": "null",
             "merchantMiscId": "null",
             "merchantProductCode": "null",
@@ -265,7 +267,7 @@ exports.sendMessage = (caseNumber, contactFullName, contactFirstName, contactLas
             ],
             "languageId": 0,
             "merchantSitePublishDate": "0001-01-01T00:00:00",
-            "name": productServiceType, //company name
+            "name": accountName,//productServiceType, //company name
             "note": "this is customer note",
             "setupFee": 0,
             "taskHoursPerMonth": 0

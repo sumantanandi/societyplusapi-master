@@ -54,12 +54,14 @@ exports.saveApplication = (caseNumber) => {
         console.log("User ID :: " + oauth.id);
         console.log('Instance URL ::', oauth.instance_url);
         //caseNumber = '03054754'; //03054754 03055059
-        var caseQuery = 'SELECT Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
+        var caseQuery = 'SELECT Account.name, AccountId ,Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.MainContact__r.email,Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
         org.query({ query: caseQuery, oauth: oauth }, function (err, resp) {
             if (!err && resp.records) {
-                var accoutName = resp.records[0];
+                var responseDetails = resp.records[0];
                 //var fields = accoutName._fields;
-                console.log(" Accout Name  ::", accoutName);
+                console.log(" Response Details ::", responseDetails);
+                var accountName = resp.records[0]._fields.account.Name;
+                var accountID = resp.records[0]._fields.accountid;
                 var emailAddress = resp.records[0]._fields.service__r.Main_Contact_Email_Address__c;
                 var contactMobile = resp.records[0]._fields.service__r.MainContact__r.Phone;
                 var conatctFirstName = resp.records[0]._fields.service__r.MainContact__r.FirstName;
@@ -74,6 +76,8 @@ exports.saveApplication = (caseNumber) => {
                     productServiceID = '21';
                 }
                 console.log(" ----------------------  START  ------------------------------   ::");
+                console.log(" accountName  ::", accountName);
+                console.log(" accountID  ::", accountID); //600870673
                 console.log(" contactFullName  ::", contactFullName);
                 console.log(" conatctFirstName  ::", conatctFirstName);
                 console.log(" contactLastName  ::", contactLastName);
@@ -85,9 +89,10 @@ exports.saveApplication = (caseNumber) => {
                 console.log(" totalrecurringCharges  ::", totalrecurringCharges);
                 console.log(" salesforceID  ::", salesforceID);
                 console.log(" emailAddress  ::", emailAddress);
+                console.log(" Account owner emailAddress  ::", resp.records[0]._fields.service__r.MainContact__r.email);
                 console.log(" ----------------------  END ------------------------------   ::");
 
-                createCustomer.sendMessage(caseNumber,contactFullName,conatctFirstName,contactLastName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
+                createCustomer.sendMessage(accountID,accountName,caseNumber,contactFullName,conatctFirstName,contactLastName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
             }
             if (err) {
                 console.log('ERROR MESSAGE :Salesforce Object Query ', err);
