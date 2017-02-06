@@ -207,13 +207,19 @@ function populateStatus(caseID, customerID) {
 }
 
 
-exports.sendMessage = (accountID, accountName, caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
+exports.sendMessage = (accountID, accountName, accountOwnerName,accountOwnerEmail,accountOwnerPhone,heading,siteSmart,caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
     return new Promise(function (resolve, reject) {
         console.log(" Message to create customer in LaunchPad");
         console.log(" caseNumber  ::", caseNumber);
         console.log(" contactFullName  ::", contactFullName);
         console.log(" accountID  ::", accountID);
         console.log(" accountName  ::", accountName);
+        console.log(" accountOwnerName ",accountOwnerName);
+        console.log(" accountOwnerEmail  ::", accountOwnerEmail);
+        console.log(" accountOwnerPhone  ::", accountOwnerPhone);
+        console.log(" heading  ::", heading);
+        console.log(" siteSmart  ::", siteSmart);
+        //console.log(" accountName  ::", accountName);
         console.log(" contactFirstName  ::", contactFirstName);
         console.log(" contactLastName  ::", contactLastName);
         console.log(" emailAddress  ::", emailAddress);
@@ -231,13 +237,13 @@ exports.sendMessage = (accountID, accountName, caseNumber, contactFullName, cont
             "email": emailField,//emailAddress,//"launchpad63.testemail@test.com",
             "merchantCampaignManager": "null",
             "merchantCampaignManagerContact": "null",
-            "merchantCategory": "null",
+            "merchantCategory": heading,
             "merchantCategoryId": "null",
-            "merchantConsultant": "null",
-            "merchantConsultantContact": "null",
+            "merchantConsultant": accountOwnerName,
+            "merchantConsultantContact": accountOwnerName,
             "merchantContractEndDate": "null",
             "merchantCustomerValue": "null",
-            "merchantId": "001p000000HzOHzAAN",//accountID,
+            "merchantId": accountID,//"001p000000HzOHzAAN",//accountID,
             "merchantItemId": "null",
             "merchantMiscId": "null",
             "merchantProductCode": "null",

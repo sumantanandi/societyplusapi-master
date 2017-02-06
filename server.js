@@ -36,8 +36,13 @@ var submitNotificationProcess = new EventEmitter();
 submitNotificationProcess.on('update-application', function (application) {
   console.log(" UPDATE NOTE APPLICATION :: ", environment);
   var serviceType = "Sensis Website";
-  var queryToGetAccountDetails = 'SELECT id,Account_Id__c,Account__c,csord__Status__c,Service_Type__c,csord__Order__r.csord__Account__r.Legacy_Customer_Number__c  FROM csord__Service__c where Service_Type__c =  \'' + serviceType + '\'' + ' limit 3';
+  var accountTemp = "100003047799"; //customer_number__c 
+  var status = 'Live'; //csord__status__c
+  //var queryToGetAccountDetails = 'SELECT id,Account_Id__c,Account__c,csord__Status__c,Service_Type__c,csord__Order__r.csord__Account__r.Legacy_Customer_Number__c  FROM csord__Service__c where Service_Type__c =  \'' + serviceType + '\'' + ' and Account_Id__c = \'' + accountTemp +'\'';
   //Legacy_Customer_Number__c 
+  var queryToGetAccountDetails = 'SELECT id,Account_Id__c,Customer_Number__c,Account__c,csord__Status__c,Service_Type__c,csord__Order__r.csord__Account__r.Legacy_Customer_Number__c  FROM csord__Service__c where Service_Type__c =  \'' + serviceType + '\'' + ' and customer_number__c = \''+ accountTemp +'\'';
+  queryToGetAccountDetails = queryToGetAccountDetails + ' and csord__status__c = \''+status+'\'';
+  console.log("queryToGetAccountDetails ",queryToGetAccountDetails);
   var configuration = JSON.parse(
     fs.readFileSync(path.join(__dirname, './config/configs.js'))
   );
@@ -80,7 +85,7 @@ submitNotificationProcess.on('update-application', function (application) {
             console.log(rec);
             var accountID = rec.get('Account_Id__c');
             var legacyAccountNumber = rec.get('csord__order__r');
-            var finalAccount = legacyAccountNumber.csord__Account__r.Legacy_Customer_Number__c;
+            var finalAccount =  rec.get('Customer_Number__c');//legacyAccountNumber.csord__Account__r.Legacy_Customer_Number__c;
             var externalAccountID = rec.get('id');
             console.log('Account ID : ' + finalAccount);
             //console.log('legacyAccountNumber : ' + legacyAccountNumber);

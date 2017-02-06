@@ -64,14 +64,16 @@ function insertDocumentAttachment(application, oauth, salesforceID) {
 
     console.log(' Inside create Attachment   :');
     console.log(oauth);
-    var attachmentName = 'Launchpad-new- ' + salesforceID + ".txt";
-    var attachment = nforce.createSObject('Attachment');
-    //var textObj = "";
-    var conversationData = [];
-    attachment.setAttachment(attachmentName, JSON.stringify(application));
+    var attachmentName = 'Launchpad-NOTE- ' + salesforceID + ".txt";
+    var attachment = nforce.createSObject('Note'); //Attachment
+    attachment.set('Title',attachmentName);
+    attachment.set('Body',application);
+    attachment.set('ParentId',salesforceID);
+    attachment.set('Id',salesforceID);
+    /*attachment.setAttachment(attachmentName, JSON.stringify(application));
     attachment.set('Name', attachmentName);
     attachment.set('ParentId', salesforceID);
-    attachment.set('Id', salesforceID);
+    attachment.set('Id', salesforceID);*/
 
     //var attachmentDoc = createAttachment(application, salesforceID);
     if (attachment) {
