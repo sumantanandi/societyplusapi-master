@@ -1,8 +1,11 @@
 <script type="text/javascript">
+var createCustomerAPI = process.env.NODE_API_CREATE_CUSTOMER || 'http://localhost:8080/api/v0/application';
+var updateNoteAPI = process.env.NODE_API_UPDATE_NOTE || 'http://localhost:8080/api/v0/updatenote';
+
 function UserAction() {
   //alert(" Inside User Action ");
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://localhost:8080/api/v0/application", false);
+    xhttp.open("POST", "https://launchpadapi.herokuapp.com/api/v0/application", false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
     var response = JSON.parse(xhttp.responseText);
@@ -12,7 +15,7 @@ function UserAction() {
 function NoteAction() {
   //alert(" Inside User Action ");
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://localhost:8080/api/v0/updatenote", false);
+    xhttp.open("POST", "https://launchpadapi.herokuapp.com/api/v0/updatenote" , false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
     var response = JSON.parse(xhttp.responseText);
@@ -79,9 +82,9 @@ function CaseAction() {
   <table class="table table-hover">
     <tbody>
       <tr ng-repeat="contact in contacts | orderBy:'lastName'" style="cursor:pointer">
-<td>
+<!--<td>
   <a ng-href="#/contact/{{contact._id}}">{{ contact.firstName }} {{ contact.lastName }}</a>
-</td>
+</td> -->
 </tr>
 </tbody>
 </table>
