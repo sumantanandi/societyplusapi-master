@@ -58,6 +58,51 @@ function updateNoteSalesforce(text, salesforceApplicantID) {
 
 }
 
+function updateNotesToChatter(text, salesforceApplicantID) {
+
+    console.log(" Calling Salesforce Chatter Update Service ");
+    var configuration = JSON.parse(
+        fs.readFileSync(path.join(__dirname, './config/configs.js'))
+    );
+    console.log(" NODE ENV IN EXPORT APPS", environment);
+    var loginUrl = configuration[environment].salesforce.username;
+    var clientId = configuration[environment].salesforce.clientId;
+    var clientSecret = configuration[environment].salesforce.clientSecret;
+    var redirectUri = configuration[environment].salesforce.redirectUri;
+    var apiVersion = configuration[environment].salesforce.apiVersion;
+    var sfdcEnvironment = configuration[environment].salesforce.environment;
+    var username = configuration[environment].salesforce.username; //'gewsprod@ge.com.orig.orignzqa' //@lfs.com.orignzqa';
+    var password = configuration[environment].salesforce.password; //
+    var token = configuration[environment].salesforce.securityToken;; //securityToken
+
+    console.log(" clientId : ", clientId);
+    console.log(" clientSecret ", clientSecret);
+    console.log(" sfdcEnvironment ", sfdcEnvironment);
+    console.log(" token ", token);
+
+    org = nforce.createConnection({
+        loginUrl: loginUrl,
+        clientId: clientId,
+        clientSecret: clientSecret,
+        redirectUri: redirectUri,
+        apiVersion: apiVersion,  // optional, defaults to current salesforce API version 
+        environment: sfdcEnvironment,  // optional, salesforce 'sandbox' or 'production', production default 
+        mode: 'multi',
+        plugins: ['chatter'] // optional, 'single' or 'multi' user mode, multi default postFeedItem
+    });
+
+    org.authenticate({ username: username, password: password, securityToken: token }, function (err, resp) {
+        if (!err) oauth = resp;
+        console.log("Salesforce ID ", salesforceApplicantID);
+        //org.chatter.postFeedItem({id: '500p0000003Ip70AAC', text: 'My Awesome Post!!'}, function(err, resp) {
+        var chatterText = text;//"Case ID : " + caseNumber + "  has been closed and LaunchPad Customer ID : " + customerID + " has been updated ";
+        org.chatter.postFeedItem({ id: salesforceApplicantID, text: chatterText, oauth: oauth }, function (err, resp) {
+            console.log(" --- update salesforce chatter for Notes--- ");
+            if (!err) console.log("resp");
+            if (err) console.log(err);
+        });
+    });
+}
 
 function insertDocumentAttachment(application, oauth, salesforceID) {
     //add attachment
@@ -95,7 +140,7 @@ exports.getCustomerNotes = (accountID, finalAccount) => {
     return new Promise(function (resolve, reject) {
         console.log(" Get Customer ID for Account ID :: in LaunchPad", apiRequestURL);
         console.log(" FINAL AccountID  ::", finalAccount);
-        console.log(" Account ID  :: ------------ ", accountID);
+        console.log(" External Account ID  :: ------------ ", accountID);
 
         var options = {
             method: 'GET',
@@ -191,7 +236,8 @@ exports.getCustomerNotes = (accountID, finalAccount) => {
                         var TotalHours = moment.utc(moment(endTime, "HH:mm:ss").diff(moment(startTime, "HH:mm:ss"))).format("HH");
                         console.log(" TIME DIFF :: IN mins ", mins);
                         console.log(" TIME DIFF :: IN Hour ", TotalHours);
-                         updateNoteSalesforce(textInformation, accountID);
+                         //updateNoteSalesforce(textInformation, accountID);
+                         updateNotesToChatter(textInformation, accountID);
                         /*if (TotalHours == '00') {
                             if (mins <= 10) {
                                 console.log(" Update notes in Salesforce ");

@@ -54,17 +54,18 @@ exports.saveApplication = (caseNumber) => {
         console.log("User ID :: " + oauth.id);
         console.log('Instance URL ::', oauth.instance_url);
         //caseNumber = '03054754'; //03054754 03055059
-        var caseQuery = 'SELECT Account.Owner.name, Account.Owner.Phone, Account.Owner.Email, Service__r.csordmedia__Service_Number__c , Account.name, AccountId ,Account.customer_number__c ,Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c,Service__r.Website_Management_Service__c, Service__r.Category__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
+        var caseQuery = 'SELECT Account.Owner.name, Account.Owner.MobilePhone, Account.Owner.Email, Service__r.csordmedia__Service_Number__c , Account.name, AccountId ,Account.customer_number__c ,Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c,Service__r.Website_Management_Service__c, Service__r.Category__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
         org.query({ query: caseQuery, oauth: oauth }, function (err, resp) {
             if (!err && resp.records) {
                 var responseDetails = resp.records[0];
                 //var fields = accoutName._fields;
                 console.log(" Response Details ::", responseDetails);
+                var serviceID = resp.records[0]._fields.service__r.csordmedia__Service_Number__c;
                 var accountName = resp.records[0]._fields.account.Name;
                 var accountOwnerName = resp.records[0]._fields.account.Owner.Name;
                 var accountID = resp.records[0]._fields.account.Customer_Number__c;
                 var accountOwnerEmail =  resp.records[0]._fields.account.Owner.Email;
-                var accountOwnerPhone = resp.records[0]._fields.account.Owner.Phone;
+                var accountOwnerPhone = resp.records[0]._fields.account.Owner.MobilePhone;
                 var salesforceAccountID = resp.records[0]._fields.accountid;
                 var heading = resp.records[0]._fields.service__r.Category__c;//Service__r.Category__c
                 var siteSmart = "No";//resp.records[0]._fields.Service__r.Website_Management_Service__c;
@@ -101,7 +102,7 @@ exports.saveApplication = (caseNumber) => {
                 console.log(" Account owner emailAddress  ::", resp.records[0]._fields.service__r.MainContact__r.email);
                 console.log(" ----------------------  END ------------------------------   ::");
 
-                createCustomer.sendMessage(accountID,accountName,accountOwnerName,accountOwnerEmail,accountOwnerPhone,heading,siteSmart,caseNumber,contactFullName,conatctFirstName,contactLastName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
+                createCustomer.sendMessage(serviceID,accountID,accountName,accountOwnerName,accountOwnerEmail,accountOwnerPhone,heading,siteSmart,caseNumber,contactFullName,conatctFirstName,contactLastName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
             }
             if (err) {
                 console.log('ERROR MESSAGE :Salesforce Object Query ', err);

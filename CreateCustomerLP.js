@@ -172,19 +172,20 @@ function populateStatus(caseID, customerID) {
         console.log(" Update Customer ID  in Case", customerID);
         console.log(" Update Case  ID  in Case", caseID);
         //var caseNumber = '03055059';
-        var caseInfo = 'SELECT Id,CaseNumber,Status,Legacy_Case_ID__c,Legacy_Advertiser_ID__c,APF_Case_ID__c FROM Case  WHERE CaseNumber = \'' + caseID + '\'';
+        var caseInfo = 'SELECT Id,Service__r.Id,CaseNumber,Status,Legacy_Case_ID__c,Legacy_Advertiser_ID__c,APF_Case_ID__c FROM Case  WHERE CaseNumber = \'' + caseID + '\'';
         org.query({ query: caseInfo, oauth: oauth }, function (err, resp) {
 
             if (!err && resp.records) {
                 var caseHistory = resp.records[0];
                 var salesforceCaseID = resp.records[0]._fields.id;
+                var salesforceServcieId = resp.records[0]._fields.service__r.Id;
                 console.log(" Case History :: ", caseHistory);
                 console.log(" Samesforce Case ID :: ", salesforceCaseID);
                 caseHistory.set('Id', salesforceCaseID);
                 caseHistory.set('CaseNumber', caseID);
                 caseHistory.set('Status', 'Closed');
                 caseHistory.set('Case_Comments__c', customerID);
-                updateChatter(salesforceCaseID, caseID, customerID);
+                updateChatter(salesforceServcieId, caseID, customerID);
                 //caseHistory.setExternalId('Id', caseNumber);
                 //caseHistory.setExternalId('Legacy_Advertiser_ID__c', caseNumber);
                 //caseHistory.setExternalId('APF_Case_ID__c', caseNumber);
@@ -207,14 +208,14 @@ function populateStatus(caseID, customerID) {
 }
 
 
-exports.sendMessage = (accountID, accountName, accountOwnerName,accountOwnerEmail,accountOwnerPhone,heading,siteSmart,caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
+exports.sendMessage = (serviceID, accountID, accountName, accountOwnerName, accountOwnerEmail, accountOwnerPhone, heading, siteSmart, caseNumber, contactFullName, contactFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType) => {
     return new Promise(function (resolve, reject) {
         console.log(" Message to create customer in LaunchPad");
         console.log(" caseNumber  ::", caseNumber);
         console.log(" contactFullName  ::", contactFullName);
         console.log(" accountID  ::", accountID);
         console.log(" accountName  ::", accountName);
-        console.log(" accountOwnerName ",accountOwnerName);
+        console.log(" accountOwnerName ", accountOwnerName);
         console.log(" accountOwnerEmail  ::", accountOwnerEmail);
         console.log(" accountOwnerPhone  ::", accountOwnerPhone);
         console.log(" heading  ::", heading);
@@ -228,8 +229,16 @@ exports.sendMessage = (accountID, accountName, accountOwnerName,accountOwnerEmai
         console.log(" productServiceID  ::", productServiceID);
         console.log("productServiceType ", productServiceType);
         console.log(" totalrecurringCharges  ::", totalrecurringCharges);
+        if (accountOwnerPhone == null) {
+            accountOwnerPhone = "null";
+        }
         if (websiteDomain == null) {
             websiteDomain = "www.sensis.com";
+        }
+        if (siteSmart == 'No') {
+            siteSmart = 'N';
+        } else {
+            siteSmart = 'Y';
         }
         var emailField = randomstring.generate(7) + emailAddress;// "launchpad63.testemail@test.com";
         var bodyObj = {
@@ -237,22 +246,22 @@ exports.sendMessage = (accountID, accountName, accountOwnerName,accountOwnerEmai
             "email": emailField,//emailAddress,//"launchpad63.testemail@test.com",
             "merchantCampaignManager": "null",
             "merchantCampaignManagerContact": "null",
-            "merchantCategory": heading,
-            "merchantCategoryId": "null",
-            "merchantConsultant": accountOwnerName,
-            "merchantConsultantContact": accountOwnerName,
+            "merchantCategory": "null",
+            "merchantCategoryId": accountOwnerPhone,//"null",//accountOwnerPhone
+            "merchantConsultant": "N",
+            "merchantConsultantContact": accountOwnerEmail,
             "merchantContractEndDate": "null",
             "merchantCustomerValue": "null",
             "merchantId": accountID,//"001p000000HzOHzAAN",//accountID,
             "merchantItemId": "null",
             "merchantMiscId": "null",
             "merchantProductCode": "null",
-            "merchantProposalId": "null",
+            "merchantProposalId": accountOwnerName,
             "merchantRegion": "null",
             "merchantServiceLevel": "null",
-            "merchantSource": "sensis",
-            "merchantSubCategory": "null",
-            "merchantSubCategoryId": "null",
+            "merchantSource": serviceID,//"Sensis Website - Premium",// service ID
+            "merchantSubCategory": heading,
+            "merchantSubCategoryId": siteSmart,
             "merchantUdac": "null",
             "phone": contactMobile,
             "products": [
