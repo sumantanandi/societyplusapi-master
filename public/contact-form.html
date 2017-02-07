@@ -1,25 +1,88 @@
-<div class = "row">
+<script type="text/javascript">
+function UserAction() {
+  //alert(" Inside User Action ");
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://localhost:8080/api/v0/application", false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+    var response = JSON.parse(xhttp.responseText);
+   // alert(response);
+}
+
+function NoteAction() {
+  //alert(" Inside User Action ");
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://localhost:8080/api/v0/updatenote", false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+    var response = JSON.parse(xhttp.responseText);
+   // alert(response);
+}
+
+function CaseAction() {
+  //alert(" Inside User Action ");
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://localhost:8080/api/v0/updatenote", false);
+    xhttp.setRequestHeader("Content-type", "application/json");
+    xhttp.send();
+    var response = JSON.parse(xhttp.responseText);
+   // alert(response);
+}
+
+</script>
+
+<div class="row">
   <div class="col-md-6">
     <h2>
-      Contacts
+      Create Customer in LaunchPad
     </h2>
   </div>
-  <div class="col-md-3">
-  </div>
+  <!-- <div class="col-md-3">
+  </div> -->
   <div class="col-md-2">
-    <a style="margin-top:20px" class="btn btn-default" href="#/new/contact">New</a>
+   <!-- <a style="margin-top:20px" class="btn btn-default" href="api/v0/application">Customer </a> -->
+    <button type="submit" style="margin-top:20px" class="btn btn-default"  onclick="UserAction()"> Customer </button>
+</div>
+<div class="col-md-1">
+</div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <h2>
+      Update Notes in Salesforce Chatter
+    </h2>
   </div>
-  <div class="col-md-1">
+  <!-- <div class="col-md-3">
+  </div> -->
+  <div class="col-md-2">
+    <!--<a style="margin-top:20px" class="btn btn-default" href="api/v0/updatenote">Notes </a> -->
+    <button type="submit" style="margin-top:20px" class="btn btn-default"  onclick="NoteAction()"> Notes     </button>
+</div>
+<div class="col-md-1">
+</div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <h2>
+      Close Cases in Salesforce
+    </h2>
   </div>
+  <!-- <div class="col-md-3">
+  </div> -->
+  <div class="col-md-2">
+    <a style="margin-top:20px" class="btn btn-default" href="api/v0/updatecases">Cases </a>
+</div>
+<div class="col-md-1">
+</div>
 </div>
 <div class="container">
   <table class="table table-hover">
     <tbody>
       <tr ng-repeat="contact in contacts | orderBy:'lastName'" style="cursor:pointer">
-        <td>
-          <a ng-href="#/contact/{{contact._id}}">{{ contact.firstName }} {{ contact.lastName }}</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<td>
+  <a ng-href="#/contact/{{contact._id}}">{{ contact.firstName }} {{ contact.lastName }}</a>
+</td>
+</tr>
+</tbody>
+</table>
 </div>

@@ -14,6 +14,10 @@ angular.module("contactsApp", ['ngRoute'])
                 controller: "NewContactController",
                 templateUrl: "contact-form.html"
             })
+            .when("/new/sensis", {
+                controller: "NewContactController",
+                templateUrl: "contact-form.html"
+            })
             .when("/contact/:contactId", {
                 controller: "EditContactController",
                 templateUrl: "contact.html"
@@ -32,11 +36,11 @@ angular.module("contactsApp", ['ngRoute'])
                 });
         }
         this.createContact = function(contact) {
-            return $http.post("/contacts", contact).
+            return $http.post("/api/v0/application", contact).
                 then(function(response) {
                     return response;
                 }, function(response) {
-                    alert("Error creating contact.");
+                    alert("Error creating customer.");
                 });
         }
         this.getContact = function(contactId) {
@@ -75,7 +79,7 @@ angular.module("contactsApp", ['ngRoute'])
     })
     .controller("NewContactController", function($scope, $location, Contacts) {
         $scope.back = function() {
-            $location.path("#/");
+            $location.path("");
         }
 
         $scope.saveContact = function(contact) {
