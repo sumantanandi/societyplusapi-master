@@ -7,7 +7,7 @@ var environment = process.env.NODE_ENV || 'local';
 var org = "";
 var oauth;
 var caseNumber = '';
-var createCustomer  = require('./CreateCustomerLP');
+var createCustomer = require('./CreateCustomerLP');
 
 createCase = (caseDetails) => {
     console.log(' Inside Case Object  :');
@@ -17,7 +17,7 @@ createCase = (caseDetails) => {
 }
 
 exports.saveApplication = (caseNumber) => {
-    console.log(" Calling Salesforce Object :: Received Case Number ",caseNumber);
+    console.log(" Calling Salesforce Object :: Received Case Number ", caseNumber);
     var configuration = JSON.parse(
         fs.readFileSync(path.join(__dirname, './config/configs.js'))
     );
@@ -54,7 +54,7 @@ exports.saveApplication = (caseNumber) => {
         console.log("User ID :: " + oauth.id);
         console.log('Instance URL ::', oauth.instance_url);
         //caseNumber = '03054754'; //03054754 03055059
-        var caseQuery = 'SELECT Account.Owner.name, Account.Owner.MobilePhone, Account.Owner.Email, Service__r.csordmedia__Service_Number__c , Account.name, AccountId ,Account.customer_number__c ,Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_Recurring_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c,Service__r.Website_Management_Service__c, Service__r.Category__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
+        var caseQuery = 'SELECT Account.Owner.name, Account.Owner.MobilePhone, Account.Owner.Email, Service__r.csordmedia__Service_Number__c , Account.name, AccountId ,Account.customer_number__c ,Service__r.MainContact__r.FirstName,Service__r.MainContact__r.LastName,Service__r.MainContact__r.Phone, Service__r.MainContact__r.MobilePhone,Service__r.Total_One_Off_Charges__c, Service__r.Service_Type__c, Service__r.Id, Service__r.Main_Contact_Email_Address__c, Service__r.Main_Contact_Full_Name__c, Service__r.New_Website__c,  Service__r.csordmedia__Product_Bundle__c,Service__r.Website_Management_Service__c, Subscription__r.Name,Service__r.Category__c FROM Case  WHERE CaseNumber = \'' + caseNumber + '\'';
         org.query({ query: caseQuery, oauth: oauth }, function (err, resp) {
             if (!err && resp.records) {
                 var responseDetails = resp.records[0];
@@ -64,7 +64,7 @@ exports.saveApplication = (caseNumber) => {
                 var accountName = resp.records[0]._fields.account.Name;
                 var accountOwnerName = resp.records[0]._fields.account.Owner.Name;
                 var accountID = resp.records[0]._fields.account.Customer_Number__c;
-                var accountOwnerEmail =  resp.records[0]._fields.account.Owner.Email;
+                var accountOwnerEmail = resp.records[0]._fields.account.Owner.Email;
                 var accountOwnerPhone = resp.records[0]._fields.account.Owner.MobilePhone;
                 var salesforceAccountID = resp.records[0]._fields.accountid;
                 var heading = resp.records[0]._fields.service__r.Category__c;//Service__r.Category__c
@@ -75,19 +75,21 @@ exports.saveApplication = (caseNumber) => {
                 var contactLastName = resp.records[0]._fields.service__r.MainContact__r.LastName;
                 var contactFullName = resp.records[0]._fields.service__r.Main_Contact_Full_Name__c;
                 var websiteDomain = resp.records[0]._fields.service__r.New_Website__c;
-                var productServiceType = resp.records[0]._fields.service__r.Service_Type__c;
-                var totalrecurringCharges = resp.records[0]._fields.service__r.Total_Recurring_Charges__c;
+                var productServiceType = resp.records[0]._fields.subscription__r.Name;
+                var totalrecurringCharges = resp.records[0]._fields.service__r.Total_One_Off_Charges__c;
                 var salesforceID = resp.records[0]._fields.service__r.Id;
                 var productServiceID = "";
-                if (productServiceType == 'Sensis Website'){
-                    productServiceID = '21';
+                if (productServiceType == 'Sensis Website') {
+                    productServiceID = '21'; //21
+                } else if (productServiceType == 'Sensis Website - Premium') {
+                    productServiceID = '20';
                 }
                 console.log(" ----------------------  START  ------------------------------   ::");
                 console.log(" accountID  ::", accountID); //600870673
                 console.log(" accountName  ::", accountName);
-                console.log(" accountOwnerName ",accountOwnerName);
-                console.log(" accountOwnerEmail ",accountOwnerEmail);
-                console.log(" accountOwnerPhone ",accountOwnerPhone);
+                console.log(" accountOwnerName ", accountOwnerName);
+                console.log(" accountOwnerEmail ", accountOwnerEmail);
+                console.log(" accountOwnerPhone ", accountOwnerPhone);
                 console.log(" contactFullName  ::", contactFullName);
                 console.log(" conatctFirstName  ::", conatctFirstName);
                 console.log(" contactLastName  ::", contactLastName);
@@ -102,7 +104,7 @@ exports.saveApplication = (caseNumber) => {
                 console.log(" Account owner emailAddress  ::", resp.records[0]._fields.service__r.MainContact__r.email);
                 console.log(" ----------------------  END ------------------------------   ::");
 
-                createCustomer.sendMessage(serviceID,accountID,accountName,accountOwnerName,accountOwnerEmail,accountOwnerPhone,heading,siteSmart,caseNumber,contactFullName,conatctFirstName,contactLastName,emailAddress,contactMobile,websiteDomain,productServiceID,totalrecurringCharges,productServiceType);
+                createCustomer.sendMessage(serviceID, accountID, accountName, accountOwnerName, accountOwnerEmail, accountOwnerPhone, heading, siteSmart, caseNumber, contactFullName, conatctFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType);
             }
             if (err) {
                 console.log('ERROR MESSAGE :Salesforce Object Query ', err);

@@ -3,6 +3,7 @@ var request = require("request");
 var nforce = require('nforce');
 var chatter = require('nforce-chatter')(nforce);
 var randomstring = require("randomstring");
+//var Slack = require('node-slack'); 
 //var truncate = require('truncate');
 //var dateFormat = require('dateformat');
 var fs = require("fs");
