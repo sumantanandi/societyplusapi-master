@@ -66,6 +66,9 @@ exports.saveApplication = (caseNumber) => {
                 var accountID = resp.records[0]._fields.account.Customer_Number__c;
                 var accountOwnerEmail = resp.records[0]._fields.account.Owner.Email;
                 var accountOwnerPhone = resp.records[0]._fields.account.Owner.MobilePhone;
+                if (accountOwnerPhone == null) {
+                    accountOwnerPhone = "null";
+                }
                 var salesforceAccountID = resp.records[0]._fields.accountid;
                 var heading = resp.records[0]._fields.service__r.Category__c;//Service__r.Category__c
                 var siteSmart = "No";//resp.records[0]._fields.Service__r.Website_Management_Service__c;
@@ -80,8 +83,10 @@ exports.saveApplication = (caseNumber) => {
                 var salesforceID = resp.records[0]._fields.service__r.Id;
                 var productServiceID = "";
                 if (productServiceType == 'Sensis Website') {
-                    productServiceID = '21'; //21
+                    productServiceID = '20'; //21
                 } else if (productServiceType == 'Sensis Website - Premium') {
+                    productServiceID = '20';
+                } else {
                     productServiceID = '20';
                 }
                 console.log(" ----------------------  START  ------------------------------   ::");

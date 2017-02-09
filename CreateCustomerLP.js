@@ -3,7 +3,7 @@ var request = require("request");
 var nforce = require('nforce');
 var chatter = require('nforce-chatter')(nforce);
 var randomstring = require("randomstring");
-//var Slack = require('node-slack'); 
+var Slack = require('node-slack');
 //var truncate = require('truncate');
 //var dateFormat = require('dateformat');
 var fs = require("fs");
@@ -53,11 +53,19 @@ function updateChatter(salesforceCaseID, caseNumber, customerID) {
         console.log("Salesforce ID ", salesforceCaseID);
         //org.chatter.postFeedItem({id: '500p0000003Ip70AAC', text: 'My Awesome Post!!'}, function(err, resp) {
         var chatterText = "Case ID : " + caseNumber + "  has been closed and LaunchPad Customer ID : " + customerID + " has been updated ";
+        var hook_url = "https://hooks.slack.com/services/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";
         org.chatter.postFeedItem({ id: salesforceCaseID, text: chatterText, oauth: oauth }, function (err, resp) {
             console.log(" --- update salesforce chatter --- ");
             if (!err) console.log("resp");
             if (err) console.log(err);
         });
+        var slack = new Slack(hook_url);
+        slack.send({
+            text: chatterText,
+            channel: '#dms-support',
+            username: 'sumanta.nandi@accenture.com'
+        });
+        console.log(" #dms-support slack is updated ");
     });
 }
 
@@ -302,7 +310,7 @@ exports.sendMessage = (serviceID, accountID, accountName, accountOwnerName, acco
             body: bodyObj
         };
         var interval = 5 * 1000; // 5 seconds;
-
+        console.log(" Option ",options);
         request(options, function (error, response, body) {
             //console.log(response);
             var customerId = body.customerId;
@@ -313,7 +321,20 @@ exports.sendMessage = (serviceID, accountID, accountName, accountOwnerName, acco
             //updateLaunchPadDetails(customerId)
             setTimeout(function (counter) {
                 console.log('Chaneg Status of Case ID Salesforce Application ');
-                populateStatus(caseNumber, customerId);
+                if (customerId) {
+                    console.log(" Customer ID Present : Update case")
+                    populateStatus(caseNumber, customerId);
+                } else {
+                    var hook_url = "https://hooks.slack.com/services/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";
+
+                    var slack = new Slack(hook_url);
+                    slack.send({
+                        text: "Unable to create customer in Launchpad for case ID "+caseNumber,
+                        channel: '#dms-support',
+                        username: 'sumanta.nandi@accenture.com'
+                    });
+                    console.log(" #dms-support slack is updated with error message ");
+                }
                 //updateChatter(caseNumber, customerId);
             }, 5000);//interval * counter, counter
             // }, 5000);
