@@ -16,15 +16,9 @@ var environment = process.env.NODE_ENV || 'local';
 exports.environment = environment;
 
 var EventEmitter = require('events').EventEmitter;
-//var societyclient = require('./libs/societyclient');
-//var credential = require('./model/Credential');
-//var applicationStore = require('./libs/salesforceConnect');
-
 var applicationStore = require('./CreateCustomerLP');
 var salesforceConnection = require('./SalesforceConnect');
 var getCustomerNotes = require('./GetCustomerNotes');
-
-
 var fetchBasicAuthFromDatabase = {};
 var fetchBasicAuthFromConfig = {};
 var calls = [];
@@ -36,10 +30,8 @@ var submitNotificationProcess = new EventEmitter();
 submitNotificationProcess.on('update-application', function (application) {
   console.log(" UPDATE NOTE APPLICATION :: ", environment);
   var serviceType = "Sensis Website";
-  var accountTemp = "100003048310"; //customer_number__c 100003048310 old : 100003047799
+  var accountTemp = "100003048310"; //customer_number__c 100003048310 old : 100003047799 ID 100003048310
   var status = 'Live'; //csord__status__c
-  //var queryToGetAccountDetails = 'SELECT id,Account_Id__c,Account__c,csord__Status__c,Service_Type__c,csord__Order__r.csord__Account__r.Legacy_Customer_Number__c  FROM csord__Service__c where Service_Type__c =  \'' + serviceType + '\'' + ' and Account_Id__c = \'' + accountTemp +'\'';
-  //Legacy_Customer_Number__c 
   var queryToGetAccountDetails = 'SELECT id,Account_Id__c,Customer_Number__c,Account__c,csord__Status__c,Service_Type__c,csord__Order__r.csord__Account__r.Legacy_Customer_Number__c  FROM csord__Service__c where Service_Type__c =  \'' + serviceType + '\'' + ' and customer_number__c = \'' + accountTemp + '\'';
   //queryToGetAccountDetails = queryToGetAccountDetails + ' and csord__status__c = \'' + status + '\'';
   //queryToGetAccountDetails = queryToGetAccountDetails +  '\'';
@@ -54,7 +46,7 @@ submitNotificationProcess.on('update-application', function (application) {
   var redirectUri = configuration[environment].salesforce.redirectUri;
   var apiVersion = configuration[environment].salesforce.apiVersion;
   var sfdcEnvironment = configuration[environment].salesforce.environment;
-  var username = configuration[environment].salesforce.username; //'gewsprod@ge.com.orig.orignzqa' //@lfs.com.orignzqa';
+  var username = configuration[environment].salesforce.username;
   var password = configuration[environment].salesforce.password; //
   var token = configuration[environment].salesforce.securityToken;; //securityToken
   var interval = 15 * 1000; // 5 seconds;
@@ -63,7 +55,6 @@ submitNotificationProcess.on('update-application', function (application) {
   console.log(" clientSecret ", clientSecret);
   console.log(" sfdcEnvironment ", sfdcEnvironment);
   console.log(" token ", token);
-
   org = nforce.createConnection({
     loginUrl: loginUrl,
     clientId: clientId,
@@ -141,7 +132,6 @@ submitApplicationProcess.on('submit-application', function (application) {
   console.log(" clientSecret ", clientSecret);
   console.log(" sfdcEnvironment ", sfdcEnvironment);
   console.log(" token ", token);
-
   org = nforce.createConnection({
     loginUrl: loginUrl,
     clientId: clientId,
@@ -183,19 +173,14 @@ submitApplicationProcess.on('submit-application', function (application) {
       });
     }
   });
-
-
-  //salesforceConnection.saveApplication(caseNumber);
 });
-
-/*async.parallel(calls, function() {
-  console.log(AllLinks);
-});*/
 
 var app = express();
 
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(multer());
 
 // Initialize the app.
 var server = app.listen(process.env.PORT || 8080, function () {
@@ -225,11 +210,8 @@ function handleSucess(res, reason, message, code) {
 //app.all("/*", auth);
 
 app.post("/api/v0/application", function (req, res) {
-  //var newContact = req.body; //case number
   var caseNo = req.body.id;
-  //var content = req.body.content;
-  console.log("Origination Application Notification Received:", app);
-  //newContact.createDate = new Date();
+  //console.log("Origination Application Notification Received:", req);
   console.log("Case Number : " + caseNo);
   submitApplicationProcess.emit('submit-application', req);
   //emit sync response
@@ -238,14 +220,12 @@ app.post("/api/v0/application", function (req, res) {
 });
 
 app.post("/api/v0/updatenote", function (req, res) {
-  //var newContact = req.body; //case number
-  var caseNo = req.body.id;
-  //var content = req.body.content;
-  console.log("Update Note Scheduler Started :", app);
-  //newContact.createDate = new Date();
-  console.log("Case Number : " + caseNo);
-  submitNotificationProcess.emit('update-application', req);
-  //emit sync response
+  //console.log('body: ' + JSON.stringify(req.body));
+  var caseNo = JSON.stringify(req.body).split(",");//req.body.id; //req.body.id;
+  var caseObj = caseNo.toString();
+  caseObj = caseObj.replace(/[^\w\s]/gi, '');
+  var externalAccountID = "11111";
+  getCustomerNotes.getCustomerNoteInformation(caseObj);
   handleSucess(res, "Received Note Notification ", 201);
   res.end();
 });

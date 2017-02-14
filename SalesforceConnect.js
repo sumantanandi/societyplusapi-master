@@ -9,13 +9,6 @@ var oauth;
 var caseNumber = '';
 var createCustomer = require('./CreateCustomerLP');
 
-createCase = (caseDetails) => {
-    console.log(' Inside Case Object  :');
-    var caseQuery = 'SELECT Service__r.Id, Service__r.Main_Contact_Email_Address__c,Service__r.Main_Contact_Full_Name__c,Service__r.New_Website__c,	ContactPhone, Service__r.csordmedia__Product_Bundle__c FROM Case where CaseNumber = "03055059"';
-
-
-}
-
 exports.saveApplication = (caseNumber) => {
     console.log(" Calling Salesforce Object :: Received Case Number ", caseNumber);
     var configuration = JSON.parse(
@@ -28,14 +21,9 @@ exports.saveApplication = (caseNumber) => {
     var redirectUri = configuration[environment].salesforce.redirectUri;
     var apiVersion = configuration[environment].salesforce.apiVersion;
     var sfdcEnvironment = configuration[environment].salesforce.environment;
-    var username = configuration[environment].salesforce.username; //'gewsprod@ge.com.orig.orignzqa' //@lfs.com.orignzqa';
+    var username = configuration[environment].salesforce.username;
     var password = configuration[environment].salesforce.password; //
     var token = configuration[environment].salesforce.securityToken;; //securityToken
-
-    console.log(" clientId : ", clientId);
-    console.log(" clientSecret ", clientSecret);
-    console.log(" sfdcEnvironment ", sfdcEnvironment);
-    console.log(" token ", token);
 
     org = nforce.createConnection({
         loginUrl: loginUrl,
@@ -58,8 +46,6 @@ exports.saveApplication = (caseNumber) => {
         org.query({ query: caseQuery, oauth: oauth }, function (err, resp) {
             if (!err && resp.records) {
                 var responseDetails = resp.records[0];
-                //var fields = accoutName._fields;
-                console.log(" Response Details ::", responseDetails);
                 var serviceID = resp.records[0]._fields.service__r.csordmedia__Service_Number__c;
                 var accountName = resp.records[0]._fields.account.Name;
                 var accountOwnerName = resp.records[0]._fields.account.Owner.Name;
@@ -83,7 +69,7 @@ exports.saveApplication = (caseNumber) => {
                 var salesforceID = resp.records[0]._fields.service__r.Id;
                 var productServiceID = "";
                 if (productServiceType == 'Sensis Website') {
-                    productServiceID = '20'; //21
+                    productServiceID = '20';
                 } else if (productServiceType == 'Sensis Website - Premium') {
                     productServiceID = '20';
                 } else {
@@ -108,18 +94,14 @@ exports.saveApplication = (caseNumber) => {
                 console.log(" emailAddress  ::", emailAddress);
                 console.log(" Account owner emailAddress  ::", resp.records[0]._fields.service__r.MainContact__r.email);
                 console.log(" ----------------------  END ------------------------------   ::");
-
                 createCustomer.sendMessage(serviceID, accountID, accountName, accountOwnerName, accountOwnerEmail, accountOwnerPhone, heading, siteSmart, caseNumber, contactFullName, conatctFirstName, contactLastName, emailAddress, contactMobile, websiteDomain, productServiceID, totalrecurringCharges, productServiceType);
             }
             if (err) {
                 console.log('ERROR MESSAGE :Salesforce Object Query ', err);
             }
         });
-
-
         if (err) {
             console.log('ERROR MESSAGE :Salesforce Object Calling ', err);
-            //statusMessage = err.message;
         }
     });
 

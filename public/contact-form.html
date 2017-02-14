@@ -1,37 +1,43 @@
-<script type="text/javascript">
-var createCustomerAPI = process.env.NODE_API_CREATE_CUSTOMER || 'http://localhost:8080/api/v0/application';
-var updateNoteAPI = process.env.NODE_API_UPDATE_NOTE || 'http://localhost:8080/api/v0/updatenote';
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+</script>
 
-function UserAction() {
-  //alert(" Inside User Action ");
+<script type="text/javascript">
+
+  var createCustomerAPI = process.env.NODE_API_CREATE_CUSTOMER || 'http://localhost:8080/api/v0/application';
+  var updateNoteAPI = process.env.NODE_API_UPDATE_NOTE || 'http://localhost:8080/api/v0/updatenote';
+
+  function UserAction() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "https://launchpadapi.herokuapp.com/api/v0/application", false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
     var response = JSON.parse(xhttp.responseText);
     alert(" Initiate Customer Create Request");
-   // alert(response);
-}
+  }
 
-function NoteAction() {
-  //alert(" Inside User Action ");
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "https://launchpadapi.herokuapp.com/api/v0/updatenote" , false);
-    xhttp.setRequestHeader("Content-type", "application/json");
-    xhttp.send();
-    var response = JSON.parse(xhttp.responseText);
-   // alert(response);
-}
+  function NoteAction() {
+    var textdata = $('textarea#noteid').val();
+    var textdatares = textdata.split(/\s+,|\s+/).join(',');
+    var trackingJSON = JSON.stringify(textdatares);
+    $.ajax({
+      type: 'POST',
+      url: 'https://launchpadapi.herokuapp.com/api/v0/updatenote',
+      data: trackingJSON,
+      dataType: 'json',
+      success: function (data) { alert("Initiate Update Note Request") },
+      error: function (e) {
+        alert(' Note update failed : ' + e);
+      }
+    });
+  }
 
-function CaseAction() {
-  //alert(" Inside User Action ");
+  function CaseAction() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "http://localhost:8080/api/v0/updatenote", false);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send();
     var response = JSON.parse(xhttp.responseText);
-   // alert(response);
-}
+  }
 
 </script>
 
@@ -44,8 +50,8 @@ function CaseAction() {
   <!-- <div class="col-md-3">
   </div> -->
   <div class="col-md-2">
-   <!-- <a style="margin-top:20px" class="btn btn-default" href="api/v0/application">Customer </a> -->
-    <button type="submit" style="margin-top:20px" class="btn btn-default"  onclick="UserAction()"> Customer </button>
+    <!-- <a style="margin-top:20px" class="btn btn-default" href="api/v0/application">Customer </a> -->
+    <button type="submit" style="margin-top:20px" class="btn btn-default" onclick="UserAction()"> Customer </button>
 </div>
 <div class="col-md-1">
 </div>
@@ -60,7 +66,9 @@ function CaseAction() {
   </div> -->
   <div class="col-md-2">
     <!--<a style="margin-top:20px" class="btn btn-default" href="api/v0/updatenote">Notes </a> -->
-    <button type="submit" style="margin-top:20px" class="btn btn-default"  onclick="NoteAction()"> Notes     </button>
+
+    <textarea id="noteid"></textarea>
+    <button id="submit" type="submit" style="margin-top:20px" class="btn btn-default" onclick="NoteAction()"> Notes </button>
 </div>
 <div class="col-md-1">
 </div>
